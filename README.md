@@ -29,7 +29,7 @@ The application combines a Vue.js frontend, Spring Boot backend, Qdrant vector d
 
 ## Architecture
 
-````text
+```text
                          ┌──────────────────────┐
                          │      Vue.js UI       │
                          │      Port 5173       │
@@ -65,6 +65,8 @@ The application combines a Vue.js frontend, Spring Boot backend, Qdrant vector d
                        │   Ollama   │
                        │ Local LLM  │
                        └────────────┘
+```
+
 ## How It Works
 
 ### 1. Document Ingestion
@@ -72,20 +74,20 @@ The application combines a Vue.js frontend, Spring Boot backend, Qdrant vector d
 A user uploads project documentation through the Vue.js interface.
 
 Document
-   │
-   ▼
+│
+▼
 Spring Boot
-   │
-   ▼
+│
+▼
 Text Extraction
-   │
-   ▼
+│
+▼
 Token-based Chunking
-   │
-   ▼
+│
+▼
 Ollama Embeddings
-   │
-   ▼
+│
+▼
 Qdrant
 
 The document is split into smaller chunks and stored as vector embeddings in Qdrant.
@@ -95,26 +97,26 @@ The document is split into smaller chunks and stored as vector embeddings in Qdr
 When a user asks a question, the backend performs semantic similarity search against the indexed project knowledge.
 
 User Question
-      │
-      ▼
+│
+▼
 Spring Boot
-      │
-      ▼
+│
+▼
 Semantic Search
-      │
-      ▼
+│
+▼
 Qdrant
-      │
-      ▼
+│
+▼
 Relevant Documents
-      │
-      ▼
+│
+▼
 Context Construction
-      │
-      ▼
+│
+▼
 Ollama
-      │
-      ▼
+│
+▼
 Generated Answer
 
 The retrieved project context is provided to the local LLM to generate a grounded response.
@@ -124,23 +126,23 @@ The retrieved project context is provided to the local LLM to generate a grounde
 For implementation-oriented questions, the backend can use MCP to inspect the actual project source code.
 
 User Question
-      │
-      ▼
+│
+▼
 Spring Boot
-      │
-      ├──────────────► Qdrant
-      │                  │
-      │                  ▼
-      │              RAG Context
-      │
-      └──────────────► MCP Server
-                         │
-                         ├── search_code()
-                         │
-                         └── get_file()
-                                │
-                                ▼
-                           Source Code
+│
+├──────────────► Qdrant
+│ │
+│ ▼
+│ RAG Context
+│
+└──────────────► MCP Server
+│
+├── search_code()
+│
+└── get_file()
+│
+▼
+Source Code
 
 The retrieved source code is combined with the RAG context before the final answer is generated.
 
@@ -150,7 +152,7 @@ RAG and MCP serve different purposes in the application.
 
 ### RAG
 
-**Retrieval-Augmented Generation provides semantic retrieval from indexed project knowledge.
+\*\*Retrieval-Augmented Generation provides semantic retrieval from indexed project knowledge.
 
 It is useful for questions such as:
 
@@ -160,7 +162,7 @@ The system searches the indexed documentation and retrieves relevant information
 
 ### MCP
 
-**Model Context Protocol provides structured access to project tools and resources.
+\*\*Model Context Protocol provides structured access to project tools and resources.
 
 It is useful for questions such as:
 
@@ -194,17 +196,18 @@ RAG + MCP
 
 The Python MCP server exposes project inspection tools.
 
-Tool	Purpose
-list_project_files()	Lists files available in the project
-search_code(query)	Searches project source code
-get_file(path)	Retrieves the contents of a project file
-search_api(query)	Searches project files for API-related definitions
+Tool Purpose
+list_project_files() Lists files available in the project
+search_code(query) Searches project source code
+get_file(path) Retrieves the contents of a project file
+search_api(query) Searches project files for API-related definitions
 
 Spring Boot connects to the MCP server using Streamable HTTP.
 
 ## Technology Stack
 
 ### Frontend
+
 Vue.js
 JavaScript
 HTML
@@ -224,44 +227,47 @@ Python 3.11
 MCP
 FastMCP
 Streamable HTTP
+
 ### Testing
 
 - JUnit
-Mockito
-Spring Boot Test
+  Mockito
+  Spring Boot Test
+
 ### DevOps
 
 - Docker
-Docker Compose
-Nginx
-Project Structure
-ai-engineering-copilot/
-│
-├── backend/
-│   ├── src/
-│   │   ├── main/
-│   │   └── test/
-│   ├── Dockerfile
-│   └── pom.xml
-│
-├── frontend/
-│   ├── src/
-│   ├── Dockerfile
-│   ├── nginx.conf
-│   └── package.json
-│
-├── mcp-server/
-│   ├── server.py
-│   ├── requirements.txt
-│   └── Dockerfile
-│
-├── sample-project/
-│   ├── src/
-│   ├── authentication.md
-│   └── README.md
-│
-├── docker-compose.yml
-└── README.md
+  Docker Compose
+  Nginx
+  Project Structure
+  ai-engineering-copilot/
+  │
+  ├── backend/
+  │ ├── src/
+  │ │ ├── main/
+  │ │ └── test/
+  │ ├── Dockerfile
+  │ └── pom.xml
+  │
+  ├── frontend/
+  │ ├── src/
+  │ ├── Dockerfile
+  │ ├── nginx.conf
+  │ └── package.json
+  │
+  ├── mcp-server/
+  │ ├── server.py
+  │ ├── requirements.txt
+  │ └── Dockerfile
+  │
+  ├── sample-project/
+  │ ├── src/
+  │ ├── authentication.md
+  │ └── README.md
+  │
+  ├── docker-compose.yml
+  └── README.md
+
 ## Prerequisites
 
 The following software is required:
@@ -272,6 +278,7 @@ Node.js
 Python 3.11+
 Docker Desktop
 Ollama
+
 ## Ollama Setup
 
 Ollama is used to run the LLM and embedding model locally.
@@ -302,15 +309,16 @@ docker compose up --build
 
 The application consists of:
 
-Frontend       → http://localhost:5173
-Backend        → http://localhost:8080
-Qdrant         → http://localhost:6333
-MCP Server     → http://localhost:8000
-Ollama         → Local host
+Frontend → http://localhost:5173
+Backend → http://localhost:8080
+Qdrant → http://localhost:6333
+MCP Server → http://localhost:8000
+Ollama → Local host
 
 Stop the application:
 
 docker compose down
+
 ### Option 2: Run Frontend Locally
 
 Navigate to the frontend directory:
@@ -328,6 +336,7 @@ npm run dev
 The frontend will be available at:
 
 http://localhost:5173
+
 ### Option 3: Run Backend Locally
 
 Navigate to the backend:
@@ -341,9 +350,11 @@ mvn spring-boot:run
 The backend will be available at:
 
 http://localhost:8080
+
 ## API Endpoints
 
 ### Upload Document
+
 POST /api/documents/upload
 
 Uploads a document and indexes its content into Qdrant.
@@ -370,6 +381,7 @@ Project Understanding
 What components are involved in authentication?
 API Exploration
 What APIs are available in this project?
+
 ## Example MCP Flow
 
 For a source-code question such as:
@@ -379,36 +391,37 @@ Explain how JwtFilter validates a token.
 the request flows through the system as follows:
 
 User
- │
- │ Question
- ▼
+│
+│ Question
+▼
 Vue.js
- │
- ▼
+│
+▼
 Spring Boot
- │
- ├──────────────► Qdrant
- │                   │
- │                   └── Relevant project knowledge
- │
- └──────────────► MCP Server
-                     │
-                     ├── search_code()
-                     │
-                     └── get_file()
-                              │
-                              ▼
-                         JwtFilter.java
-                              │
-                              ▼
-                           Ollama
-                              │
-                              ▼
-                           Answer
+│
+├──────────────► Qdrant
+│ │
+│ └── Relevant project knowledge
+│
+└──────────────► MCP Server
+│
+├── search_code()
+│
+└── get_file()
+│
+▼
+JwtFilter.java
+│
+▼
+Ollama
+│
+▼
+Answer
 
 The frontend displays the MCP activity and knowledge sources associated with the response.
 
 ## Document Ingestion Flow
+
                  Uploaded Document
                         │
                         ▼
@@ -454,29 +467,31 @@ The test suite validates the core backend functionality independently from the r
 Docker Compose manages the application services.
 
 ┌────────────────────────────────────────────────────────┐
-│                    Docker Compose                      │
-│                                                        │
-│  ┌──────────────┐       ┌─────────────────────────┐   │
-│  │   Frontend   │──────►│       Backend           │   │
-│  │   Nginx      │       │      Spring Boot        │   │
-│  │    :5173     │       │        :8080             │   │
-│  └──────────────┘       └───────┬─────────┬───────┘   │
-│                                 │         │           │
-│                                 ▼         ▼           │
-│                          ┌──────────┐ ┌───────────┐  │
-│                          │  Qdrant  │ │ MCP Server│  │
-│                          │  :6334   │ │   :8000   │  │
-│                          └──────────┘ └───────────┘  │
-│                                                        │
+│ Docker Compose │
+│ │
+│ ┌──────────────┐ ┌─────────────────────────┐ │
+│ │ Frontend │──────►│ Backend │ │
+│ │ Nginx │ │ Spring Boot │ │
+│ │ :5173 │ │ :8080 │ │
+│ └──────────────┘ └───────┬─────────┬───────┘ │
+│ │ │ │
+│ ▼ ▼ │
+│ ┌──────────┐ ┌───────────┐ │
+│ │ Qdrant │ │ MCP Server│ │
+│ │ :6334 │ │ :8000 │ │
+│ └──────────┘ └───────────┘ │
+│ │
 └────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-                         Ollama Host
+│
+▼
+Ollama Host
 
 Ollama remains on the host machine and is accessed by the backend through:
 
 host.docker.internal:11434
+
 ## Design Decisions
+
 ### Why RAG?
 
 Traditional LLMs do not automatically know the contents of a private project.
@@ -514,6 +529,7 @@ No dependency on paid AI APIs
 Local inference
 Easier experimentation
 Better control over development data
+
 ### Why Spring Boot?
 
 Spring Boot acts as the central application layer.
@@ -526,6 +542,7 @@ RAG orchestration
 Vector database integration
 LLM interaction
 MCP client integration
+
 ## Security and Grounding
 
 The application is designed to reduce unsupported project-specific claims.
@@ -541,6 +558,7 @@ Avoid making security claims that are not demonstrated by the source code
 If the requested information is not available in the supplied project evidence, the application instructs the model to respond:
 
 That information is not available in the indexed project.
+
 ## Current Limitations
 
 This project is an engineering-focused prototype.
@@ -553,6 +571,7 @@ The MCP server operates against the configured sample project.
 Document ingestion currently focuses on text-based project content.
 The Copilot itself does not currently implement user authentication or authorization.
 Conversation history is not persisted.
+
 ## Future Improvements
 
 Potential improvements include:
@@ -570,6 +589,7 @@ Repository-wide code analysis
 Automated test generation
 Pull-request analysis
 Code review assistance
+
 ## Key Learning Outcomes
 
 This project demonstrates practical implementation of:
@@ -587,24 +607,19 @@ MCP tool integration
 Unit and controller testing
 Docker containerization
 Multi-container application orchestration
+
 ## Project Goal
 
 The goal of this project is to demonstrate how modern AI application patterns can be integrated with traditional enterprise application development.
 
 The application combines:
 
-Java / Spring Boot
-        +
-Vue.js
-        +
-RAG
-        +
-Qdrant
-        +
-Ollama
-        +
-MCP
-        +
+Java / Spring Boot +
+Vue.js +
+RAG +
+Qdrant +
+Ollama +
+MCP +
 Docker
 
 to create a practical AI-assisted software engineering application capable of answering project-specific questions using both indexed knowledge and controlled source-code inspection.
@@ -614,4 +629,7 @@ to create a practical AI-assisted software engineering application capable of an
 Built as an AI engineering project demonstrating full-stack development,
 RAG-based information retrieval, MCP-based tool integration,
 local LLM inference, automated testing, and containerized deployment.
-````
+
+```
+
+```

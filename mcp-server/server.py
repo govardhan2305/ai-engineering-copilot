@@ -7,7 +7,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent / "sample-project"
 
 mcp = FastMCP(
     "AI Engineering Copilot",
-    host="127.0.0.1",
+    host="0.0.0.0",
     port=8000
 )
 

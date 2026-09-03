@@ -8,5 +8,39 @@ services:
     volumes:
       - qdrant_storage:/qdrant/storage
 
+  mcp-server:
+    build:
+      context: .
+      dockerfile: mcp-server/Dockerfile
+    container_name: ai-copilot-mcp
+    ports:
+      - "8000:8000"
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: ai-copilot-backend
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_AI_VECTORSTORE_QDRANT_HOST: qdrant
+      SPRING_AI_VECTORSTORE_QDRANT_PORT: 6334
+      SPRING_AI_MCP_CLIENT_STREAMABLE_HTTP_CONNECTIONS_PROJECT_SERVER_URL: http://mcp-server:8000
+      SPRING_AI_OLLAMA_BASE_URL: http://host.docker.internal:11434
+    depends_on:
+      - qdrant
+      - mcp-server
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: ai-copilot-frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
 volumes:
   qdrant_storage:

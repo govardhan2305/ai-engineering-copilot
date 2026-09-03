@@ -1,4 +1,4 @@
-package ai_engineering_copilot;
+package com.copilot;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

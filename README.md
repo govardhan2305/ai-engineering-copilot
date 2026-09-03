@@ -630,6 +630,4 @@ Built as an AI engineering project demonstrating full-stack development,
 RAG-based information retrieval, MCP-based tool integration,
 local LLM inference, automated testing, and containerized deployment.
 
-```
 
-```

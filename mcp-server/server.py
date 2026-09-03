@@ -27,56 +27,26 @@ def list_project_files() -> list[str]:
 
 
 @mcp.tool()
-def get_file(query: str) -> str:
+def get_file(path: str) -> str:
     """
-    Read a specific project file.
+    Read the contents of a specific project file.
 
-    IMPORTANT:
-    - This tool accepts exactly one argument named "path".
-    - Do NOT use "query" with this tool.
-    - The path must be the relative file path returned by list_project_files
-      or search_code.
+    Use the exact relative path returned by search_code()
+    or list_project_files().
     """
-    print(f"[MCP] search_code called with query: {query}", flush=True)
 
-    file_path = (PROJECT_ROOT / query).resolve()
+    print(f"[MCP] get_file called with path: {path}", flush=True)
+
+    file_path = (PROJECT_ROOT / path).resolve()
 
     if not file_path.is_relative_to(PROJECT_ROOT.resolve()):
         return "Error: Access outside the project directory is not allowed."
 
     if not file_path.exists():
-        return f"Error: File not found: {query}"
+        return f"Error: File not found: {path}"
 
     if not file_path.is_file():
-        return f"Error: Path is not a file: {query}"
-
-    return file_path.read_text(encoding="utf-8")
-
-@mcp.tool()
-def read_jwt_filter() -> str:
-    """
-    Read the JwtFilter source code from the sample project.
-
-    Use this tool when the user asks about JWT token validation
-    or the JwtFilter implementation.
-    """
-
-    file_path = (
-        PROJECT_ROOT
-        / "src"
-        / "main"
-        / "java"
-        / "com"
-        / "example"
-        / "demo"
-        / "security"
-        / "JwtFilter.java"
-    )
-
-    print("[MCP] read_jwt_filter called", flush=True)
-
-    if not file_path.exists():
-        return "Error: JwtFilter.java was not found."
+        return f"Error: Path is not a file: {path}"
 
     return file_path.read_text(encoding="utf-8")
 
@@ -121,7 +91,7 @@ def search_code(query: str) -> list[dict[str, str]]:
 @mcp.tool()
 def search_api(query: str) -> list[dict[str, str]]:
     """Search project files for API-related definitions."""
-    print(f"[MCP] search_code called with query: {query}", flush=True)
+
 
     return search_code(query)
 

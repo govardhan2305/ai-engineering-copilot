@@ -4,6 +4,7 @@ import com.copilot.model.RagQueryRequest;
 import com.copilot.service.RagService;
 import org.springframework.ai.document.Document;
 import org.springframework.web.bind.annotation.*;
+import com.copilot.model.RagQueryResponse;
 
 import java.util.List;
 
@@ -23,7 +24,7 @@ public class RagController {
     }
 
     @PostMapping("/ask")
-    public String ask(@RequestBody RagQueryRequest request) {
+    public RagQueryResponse ask(@RequestBody RagQueryRequest request) {
         return ragService.ask(request.question());
     }
 }

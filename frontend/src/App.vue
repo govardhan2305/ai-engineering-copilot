@@ -3,13 +3,62 @@ import { ref } from 'vue'
 
 const question = ref('')
 const answer = ref('')
+const sources = ref([])
+const tools = ref([])
 const loading = ref(false)
+
+const selectedFile = ref(null)
+const uploading = ref(false)
+const uploadMessage = ref('')
+
+const handleFileSelect = (event) => {
+  selectedFile.value = event.target.files[0]
+  uploadMessage.value = ''
+}
+
+const uploadDocument = async () => {
+  if (!selectedFile.value) return
+
+  uploading.value = true
+  uploadMessage.value = ''
+
+  const formData = new FormData()
+  formData.append('file', selectedFile.value)
+
+  try {
+    const response = await fetch(
+      'http://localhost:8080/api/documents/upload',
+      {
+        method: 'POST',
+        body: formData
+      }
+    )
+
+    if (!response.ok) {
+      throw new Error(`Upload failed: ${response.status}`)
+    }
+
+    const result = await response.json()
+
+    uploadMessage.value =
+      `${result.fileName} indexed successfully — ` +
+      `${result.chunksCreated} chunk(s) created.`
+
+  } catch (error) {
+    uploadMessage.value = 'Unable to upload the document.'
+    console.error(error)
+  } finally {
+    uploading.value = false
+  }
+}
 
 const askQuestion = async () => {
   if (!question.value.trim()) return
 
   loading.value = true
   answer.value = ''
+  sources.value = []
+  tools.value = []
 
   try {
     const response = await fetch('http://localhost:8080/api/rag/ask', {
@@ -26,7 +75,11 @@ const askQuestion = async () => {
       throw new Error(`Request failed: ${response.status}`)
     }
 
-    answer.value = await response.text()
+    const result = await response.json()
+
+    answer.value = result.answer
+    sources.value = result.sources || []
+    tools.value = result.tools || []
   } catch (error) {
     answer.value = 'Unable to connect to the AI backend. Make sure Spring Boot is running on port 8080.'
     console.error(error)
@@ -53,6 +106,35 @@ const askQuestion = async () => {
 
     <main class="main">
 
+      <section class="upload-card">
+
+        <div class="upload-header">
+          <div>
+            <h3>Project Knowledge</h3>
+            <p>Upload documentation to add it to the RAG knowledge base.</p>
+          </div>
+        </div>
+
+        <div class="upload-controls">
+
+          <input type="file" id="file-upload" @change="handleFileSelect" />
+
+          <button @click="uploadDocument" :disabled="!selectedFile || uploading">
+            {{ uploading ? 'Indexing...' : 'Upload & Index' }}
+          </button>
+
+        </div>
+
+        <p v-if="selectedFile" class="selected-file">
+          Selected: {{ selectedFile.name }}
+        </p>
+
+        <p v-if="uploadMessage" class="upload-message">
+          {{ uploadMessage }}
+        </p>
+
+      </section>
+
       <section class="welcome">
         <h2>Ask anything about your project</h2>
         <p>
@@ -72,23 +154,43 @@ const askQuestion = async () => {
           <div class="answer-content">
             {{ answer }}
           </div>
+          <div v-if="tools.length" class="sources">
+
+            <div class="section-title">
+              🔧 MCP Activity
+            </div>
+
+            <div class="source-list">
+              <span v-for="tool in tools" :key="tool" class="source tool">
+                ✓ {{ tool }}
+              </span>
+            </div>
+
+          </div>
+
+          <div v-if="sources.length" class="sources">
+
+            <div class="section-title">
+              📚 Knowledge Sources
+            </div>
+
+            <div class="source-list">
+              <span v-for="source in sources" :key="source" class="source">
+                {{ source }}
+              </span>
+            </div>
+
+          </div>
         </div>
 
         <div class="input-area">
-          <textarea
-            v-model="question"
-            placeholder="Ask about your project..."
-            rows="4"
-            @keydown.ctrl.enter="askQuestion"
-          ></textarea>
+          <textarea v-model="question" placeholder="Ask about your project..." rows="4"
+            @keydown.ctrl.enter="askQuestion"></textarea>
 
           <div class="input-footer">
             <span>Ctrl + Enter to ask</span>
 
-            <button
-              @click="askQuestion"
-              :disabled="loading || !question.trim()"
-            >
+            <button @click="askQuestion" :disabled="loading || !question.trim()">
               {{ loading ? 'Thinking...' : 'Ask Copilot' }}
             </button>
           </div>
@@ -102,21 +204,15 @@ const askQuestion = async () => {
 
         <div class="example-grid">
 
-          <button
-            @click="question = 'Where is JWT authentication implemented in this project?'"
-          >
-            🔐 Where is JWT authentication implemented?
+          <button @click="question = 'What components are involved in authentication?'">
+            🔐 What components are involved in authentication?
           </button>
 
-          <button
-            @click="question = 'Explain how JwtFilter validates a token.'"
-          >
+          <button @click="question = 'Explain how JwtFilter validates a token.'">
             🔎 Explain how JwtFilter validates a token
           </button>
 
-          <button
-            @click="question = 'What APIs are available in this project?'"
-          >
+          <button @click="question = 'What APIs are available in this project?'">
             🔌 What APIs are available?
           </button>
 
@@ -352,5 +448,92 @@ textarea::placeholder {
   .example-grid {
     grid-template-columns: 1fr;
   }
+}
+
+.upload-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.upload-header h3 {
+  margin: 0 0 5px;
+  font-size: 16px;
+}
+
+.upload-header p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.upload-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.upload-controls input {
+  flex: 1;
+}
+
+.upload-controls button {
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  background: #111827;
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.upload-controls button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.selected-file,
+.upload-message {
+  margin: 12px 0 0;
+  font-size: 13px;
+}
+
+.selected-file {
+  color: #4b5563;
+}
+
+.upload-message {
+  color: #15803d;
+}
+
+.sources {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.section-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #6b7280;
+  margin-bottom: 8px;
+}
+
+.source {
+  display: inline-block;
+  background: #f3f4f6;
+  border-radius: 6px;
+  padding: 5px 9px;
+  margin-right: 6px;
+  font-size: 12px;
+  color: #4b5563;
+}
+
+.tool {
+  background: #ecfdf5;
+  color: #166534;
 }
 </style>
